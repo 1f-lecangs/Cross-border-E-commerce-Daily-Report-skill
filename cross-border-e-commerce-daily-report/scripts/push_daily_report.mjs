@@ -219,7 +219,7 @@ async function fetchText(urlValue) {
   try {
     const response = await fetchPublicResource(urlValue, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'push-daily-report-skill/1.0', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, text/html' },
+      headers: { 'User-Agent': 'cross-border-e-commerce-daily-report-skill/1.0', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, text/html' },
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const reader = response.body?.getReader();

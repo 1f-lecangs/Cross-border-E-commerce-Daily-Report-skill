@@ -4,11 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import test from 'node:test';
-import { buildHtml, filterAndRank, normalizeConfig, parseFeed, validatePublicUrl } from '../push-daily-report/scripts/push_daily_report.mjs';
+import { buildHtml, filterAndRank, normalizeConfig, parseFeed, validatePublicUrl } from '../cross-border-e-commerce-daily-report/scripts/push_daily_report.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
 const fixturePath = path.join(root, 'tests', 'fixtures', 'sample-feed.xml');
-const configPath = path.join(root, 'push-daily-report', 'references', 'sources.example.json');
+const configPath = path.join(root, 'cross-border-e-commerce-daily-report', 'references', 'sources.example.json');
 
 test('rejects local, private, credential-bearing, and non-http URLs', () => {
   for (const value of ['http://localhost/feed', 'http://127.0.0.1/feed', 'http://10.0.0.8/feed', 'file:///tmp/feed', 'https://user:pass@example.com/feed']) {
@@ -41,8 +41,8 @@ test('escapes feed-controlled content in HTML', () => {
 });
 
 test('CLI fixture run generates local HTML and JSON without secrets or network', async () => {
-  const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), 'push-daily-report-'));
-  const script = path.join(root, 'push-daily-report', 'scripts', 'push_daily_report.mjs');
+  const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), 'cross-border-e-commerce-daily-report-'));
+  const script = path.join(root, 'cross-border-e-commerce-daily-report', 'scripts', 'push_daily_report.mjs');
   const result = spawnSync(process.execPath, [script, '--config', configPath, '--fixture', fixturePath, '--ignore-age', '--no-ai', '--date', '2026-08-27', '--output-dir', outputDir], {
     encoding: 'utf8',
     env: {},

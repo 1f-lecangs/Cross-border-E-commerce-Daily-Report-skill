@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cross-border E-commerce Daily Report"
+  short_description: "Create daily news briefs for cross-border sellers"
+  default_prompt: "Use $cross-border-e-commerce-daily-report to create a reviewed daily news brief for cross-border e-commerce sellers."

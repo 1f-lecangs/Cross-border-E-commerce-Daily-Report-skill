@@ -1,11 +1,11 @@
 {
-  "name": "push-daily-report-skill",
+  "name": "cross-border-e-commerce-daily-report-skill",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Sanitized Codex Skill for generating and optionally publishing daily RSS briefs",
+  "description": "Codex Skill for generating cross-border e-commerce news briefs for sellers",
   "scripts": {
-    "check": "node --check push-daily-report/scripts/push_daily_report.mjs",
+    "check": "node --check cross-border-e-commerce-daily-report/scripts/push_daily_report.mjs",
     "test": "node --test tests/*.test.mjs"
   },
   "engines": {

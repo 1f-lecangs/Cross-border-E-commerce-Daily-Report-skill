@@ -1,4 +1,4 @@
-# 跨境电商卖家每日资讯 Skill
+# Cross-border E-commerce Daily Report Skill
 
 为跨境电商卖家准备的每日行业资讯参考工具。它从公开 RSS/Atom 来源汇集平台政策、跨境物流、海外仓、关务与关税、市场趋势等信息，按关键词筛选、排序和去重，生成便于每天快速浏览的 HTML/JSON 日报；确认内容后，也可以选择推送到指定 webhook。
 
@@ -24,10 +24,10 @@
 ## 仓库结构
 
 ```text
-push-daily-report-skill/
+Cross-border-E-commerce-Daily-Report-skill/
 ├── README.md
 ├── package.json
-├── push-daily-report/
+├── cross-border-e-commerce-daily-report/
 │   ├── SKILL.md
 │   ├── agents/openai.yaml
 │   ├── references/
@@ -45,21 +45,21 @@ push-daily-report-skill/
 
 ## 安装为 Codex Skill
 
-将仓库中的 `push-daily-report/` 复制到 Codex Skills 目录：
+将仓库中的 `cross-border-e-commerce-daily-report/` 复制到 Codex Skills 目录：
 
 ```bash
-cp -R push-daily-report "${CODEX_HOME:-$HOME/.codex}/skills/push-daily-report"
+cp -R cross-border-e-commerce-daily-report "${CODEX_HOME:-$HOME/.codex}/skills/cross-border-e-commerce-daily-report"
 ```
 
-重新启动 Codex 后，可通过 `$push-daily-report` 使用。
+重新启动 Codex 后，可通过 `$cross-border-e-commerce-daily-report` 使用。
 
 ## 快速开始
 
 公开示例配置默认关注跨境电商、平台、物流、海外仓、关务和供应链等主题。从仓库根目录执行：
 
 ```bash
-node push-daily-report/scripts/push_daily_report.mjs \
-  --config push-daily-report/references/sources.example.json \
+node cross-border-e-commerce-daily-report/scripts/push_daily_report.mjs \
+  --config cross-border-e-commerce-daily-report/references/sources.example.json \
   --output-dir ./daily-report-output \
   --no-ai
 ```
@@ -72,7 +72,7 @@ node push-daily-report/scripts/push_daily_report.mjs \
 示例配置只包含公开 feed 地址和通用跨境电商关键词。建议复制后再修改：
 
 ```bash
-cp push-daily-report/references/sources.example.json ./sources.local.json
+cp cross-border-e-commerce-daily-report/references/sources.example.json ./sources.local.json
 ```
 
 `sources.local.json` 如包含内部来源，应加入本机忽略规则，不要提交。
@@ -95,7 +95,7 @@ DAILY_REPORT_AI_MODEL
 
 ```bash
 DAILY_REPORT_WEBHOOK_URL="<runtime-secret>" \
-node push-daily-report/scripts/push_daily_report.mjs \
+node cross-border-e-commerce-daily-report/scripts/push_daily_report.mjs \
   --config ./sources.local.json \
   --output-dir ./daily-report-output \
   --push
@@ -111,10 +111,10 @@ node push-daily-report/scripts/push_daily_report.mjs \
 ## 命令参数
 
 ```bash
-node push-daily-report/scripts/push_daily_report.mjs --help
+node cross-border-e-commerce-daily-report/scripts/push_daily_report.mjs --help
 ```
 
-详细字段和安全边界见 [configuration.md](push-daily-report/references/configuration.md)。
+详细字段和安全边界见 [configuration.md](cross-border-e-commerce-daily-report/references/configuration.md)。
 
 ## 测试
 

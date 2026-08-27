@@ -1,9 +1,9 @@
 ---
-name: push-daily-report
-description: Collect public RSS/Atom feeds, filter and rank relevant stories, optionally summarize them through an OpenAI-compatible API, generate local HTML and JSON daily briefs, and publish an approved summary to a webhook. Use when Codex needs to create, refresh, review, automate, or safely publish a news roundup or daily industry report without embedding credentials or private workspace data.
+name: cross-border-e-commerce-daily-report
+description: Collect public RSS/Atom feeds about marketplace policies, cross-border logistics, overseas warehousing, customs, tariffs, and market trends; filter and rank relevant stories; optionally summarize them through an OpenAI-compatible API; and generate local HTML and JSON daily briefs for cross-border e-commerce sellers. Use when Codex needs to create, refresh, review, automate, or safely publish a seller-focused daily industry report without embedding credentials or private workspace data.
 ---
 
-# Push Daily Report
+# Cross-border E-commerce Daily Report
 
 Generate locally first. Publish only after the user explicitly asks to send the report to an external destination.
 
