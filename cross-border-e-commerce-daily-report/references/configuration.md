@@ -17,15 +17,40 @@ Pass a JSON file with `--config`. Supported fields:
 | `title` | string | Report title shown in HTML, JSON, and webhook text |
 | `timeZone` | string | IANA time zone used for the default report date |
 | `maxItems` | integer | Maximum selected items; constrained to 1–50 |
+| `maxItemsPerSource` | integer | Maximum final items from one named source; constrained to 1–50 |
+| `minAdapterItems` | integer | Minimum final items reserved for matching bundled adapter sources; constrained to 0–50 |
 | `lookbackHours` | integer | Exclude older dated items; constrained to 1–720 |
 | `includeKeywords` | string[] | Positive relevance terms; matching is case-insensitive |
 | `excludeKeywords` | string[] | Terms that always remove an item |
-| `sources` | object[] | Public RSS/Atom feeds with `name`, `url`, and optional `weight` |
+| `sources` | object[] | Public RSS/Atom feeds or bundled allowlisted adapters |
 | `ai.enabled` | boolean | Allow optional AI summaries when all AI environment variables exist |
 | `ai.maxItems` | integer | Maximum selected items sent for AI summarization |
 | `webhookType` | string | `feishu` or `generic-json`; defaults to `generic-json` |
 
 Do not add API keys, webhook URLs, private hostnames, customer names, chat IDs, tokens, cookies, internal paths, or private feed URLs to the configuration.
+
+For RSS/Atom, provide `name`, `url`, optional `weight`, and optional `maxItems`. For a bundled Chinese source, provide `name`, `adapter`, optional `weight`, and optional `maxItems`. Adapter URLs are fixed in code and cannot be overridden.
+
+Supported adapters:
+
+| Adapter | Public source |
+|---|---|
+| `cifnews-home` | CIFNews public homepage |
+| `data10100-news` | 大数跨境 public news page |
+| `ikjzd-news` | 雨果网 public news page |
+
+Example:
+
+```json
+{
+  "name": "雨果网",
+  "adapter": "ikjzd-news",
+  "weight": 3,
+  "maxItems": 12
+}
+```
+
+Do not add a `url` to an adapter entry. Unknown adapter IDs and URL overrides are rejected.
 
 ## AI environment variables
 
@@ -67,6 +92,9 @@ If any value is missing, the script keeps feed summaries and prints only a non-s
 - Local generation never requires a secret.
 - Publishing cannot occur without both `--push` and a runtime webhook URL.
 - Private IPs, hostnames resolving to private addresses, localhost, non-HTTP protocols, credentials embedded in URLs, and unsafe redirect targets are rejected.
+- Chinese adapters use fixed public endpoints, per-adapter host allowlists, HTTPS-only article links, bounded response sizes, and cross-domain redirect rejection.
+- The adapters do not use cookies, authentication, browser sessions, anti-bot bypasses, or user-provided selectors.
+- A failed source is skipped without stopping other sources.
 - Publication history stores SHA-256 hashes rather than titles or URLs.
 - Generated HTML escapes all feed-controlled text.
 - Network requests use bounded timeouts and response-size limits.

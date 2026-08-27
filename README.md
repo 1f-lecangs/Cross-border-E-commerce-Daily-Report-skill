@@ -1,6 +1,6 @@
 # Cross-border E-commerce Daily Report Skill
 
-为跨境电商卖家准备的每日行业资讯参考工具。它从公开 RSS/Atom 来源汇集平台政策、跨境物流、海外仓、关务与关税、市场趋势等信息，按关键词筛选、排序和去重，生成便于每天快速浏览的 HTML/JSON 日报；确认内容后，也可以选择推送到指定 webhook。
+为跨境电商卖家准备的每日行业资讯参考工具。它从公开 RSS/Atom 和经过域名白名单限制的中文行业页面汇集平台政策、跨境物流、海外仓、关务与关税、市场趋势等信息，按中英文关键词筛选、排序和去重，生成便于每天快速浏览的 HTML/JSON 日报；确认内容后，也可以选择推送到指定 webhook。
 
 ## 卖家每天可以关注什么
 
@@ -18,6 +18,7 @@
 - 必须同时提供运行时环境变量和 `--push` 才会发送外部请求。
 - API Key 和 Webhook 只从进程环境读取，脚本不会打印或写入报告。
 - 配置拒绝 localhost、`.local`、私网 IP、解析到私网的域名、危险重定向、非 HTTP(S) 协议和 URL 内嵌凭据。
+- 中文页面适配器使用固定公开入口和域名白名单，拒绝用户覆盖 URL、跨域重定向、Cookie、登录和反爬绕过。
 - 发布历史只保存日期和 SHA-256 哈希，不保存标题、链接或正文。
 - HTML 对来自 feed 的文本进行转义；网络请求具有超时和响应体积限制。
 
@@ -33,7 +34,9 @@ Cross-border-E-commerce-Daily-Report-skill/
 │   ├── references/
 │   │   ├── configuration.md
 │   │   └── sources.example.json
-│   └── scripts/push_daily_report.mjs
+│   └── scripts/
+│       ├── push_daily_report.mjs
+│       └── source_adapters.mjs
 └── tests/
 ```
 
@@ -55,7 +58,7 @@ cp -R cross-border-e-commerce-daily-report "${CODEX_HOME:-$HOME/.codex}/skills/c
 
 ## 快速开始
 
-公开示例配置默认关注跨境电商、平台、物流、海外仓、关务和供应链等主题。从仓库根目录执行：
+公开示例配置默认混合采集 CIFNews、大数跨境、雨果网和 5 个英文 RSS，并关注跨境电商、平台、物流、海外仓、关务和供应链等中英文主题。从仓库根目录执行：
 
 ```bash
 node cross-border-e-commerce-daily-report/scripts/push_daily_report.mjs \
@@ -69,13 +72,25 @@ node cross-border-e-commerce-daily-report/scripts/push_daily_report.mjs \
 - `daily-report-output/daily-report_YYYY-MM-DD.html`
 - `daily-report-output/daily-report_YYYY-MM-DD.json`
 
-示例配置只包含公开 feed 地址和通用跨境电商关键词。建议复制后再修改：
+示例配置只包含公开信源、固定中文适配器 ID 和通用跨境电商关键词。建议复制后再修改：
 
 ```bash
 cp cross-border-e-commerce-daily-report/references/sources.example.json ./sources.local.json
 ```
 
 `sources.local.json` 如包含内部来源，应加入本机忽略规则，不要提交。
+
+## 中文信源
+
+默认启用的中文公开信源：
+
+- CIFNews：固定首页适配器 `cifnews-home`。
+- 大数跨境：固定资讯页适配器 `data10100-news`。
+- 雨果网：固定快讯页适配器 `ikjzd-news`。
+
+亿恩网 RSS 和卖家之家接口在本次发布前的连通性检查中超时，因此未放入默认配置。Skill 不会绕过站点限制；后续只有在公开入口恢复并完成验证后才应启用。
+
+为避免单一站点或单一语言占满日报，默认每个信源最多入选 3 条，并为符合关键词的中文适配器资讯保留至少 3 个席位；没有匹配内容时不会强行补入无关资讯。
 
 ## 可选 AI 摘要
 
@@ -123,4 +138,4 @@ npm test
 npm run check
 ```
 
-测试使用本地虚构 RSS，不访问真实 feed、不调用 AI、不推送 webhook。
+测试使用本地虚构 RSS 和中文网页 Fixture，不访问真实信源、不调用 AI、不推送 webhook。

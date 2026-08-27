@@ -7,6 +7,7 @@ import { isIP } from 'node:net';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { adapterDefinition, parseAdapter } from './source_adapters.mjs';
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_CONFIG = path.resolve(SCRIPT_DIR, '..', 'references', 'sources.example.json');
@@ -110,15 +111,22 @@ async function ensurePublicResolution(url, label = 'URL') {
   }
 }
 
-async function fetchPublicResource(urlValue, init = {}, redirects = 0) {
+function requireAllowedHost(url, allowedHosts) {
+  if (allowedHosts?.length && !allowedHosts.includes(url.hostname.toLowerCase())) {
+    throw new Error(`source adapter refused host: ${url.hostname}`);
+  }
+}
+
+async function fetchPublicResource(urlValue, init = {}, redirects = 0, allowedHosts = null) {
   if (redirects > 4) throw new Error('too many redirects');
   const url = validatePublicUrl(urlValue);
+  requireAllowedHost(url, allowedHosts);
   await ensurePublicResolution(url);
   const response = await fetch(url, { ...init, redirect: 'manual' });
   if (response.status >= 300 && response.status < 400) {
     const location = response.headers.get('location');
     if (!location) throw new Error(`redirect ${response.status} did not include a location`);
-    return fetchPublicResource(new URL(location, url).href, init, redirects + 1);
+    return fetchPublicResource(new URL(location, url).href, init, redirects + 1, allowedHosts);
   }
   return response;
 }
@@ -129,14 +137,24 @@ export function normalizeConfig(raw) {
     if (!source || typeof source !== 'object') throw new Error(`Source ${index + 1} must be an object`);
     const name = String(source.name || '').trim().slice(0, 100);
     if (!name) throw new Error(`Source ${index + 1} needs a name`);
+    const adapter = String(source.adapter || '').trim();
+    const weight = clamp(source.weight, 0, 10, 1);
+    const maxItems = clamp(source.maxItems, 1, 50, 12);
+    if (adapter) {
+      adapterDefinition(adapter);
+      if (Object.hasOwn(source, 'url')) throw new Error(`Source ${name} must not override an adapter URL`);
+      return { name, adapter, weight, maxItems };
+    }
     const url = validatePublicUrl(String(source.url || ''), `Source ${name}`).href;
-    return { name, url, weight: clamp(source.weight, 0, 10, 1) };
+    return { name, url, weight, maxItems };
   }) : [];
   if (!sources.length) throw new Error('Config must contain at least one source');
   return {
     title: String(raw.title || 'Daily Industry Brief').trim().slice(0, 160),
     timeZone: String(raw.timeZone || 'UTC'),
     maxItems: clamp(raw.maxItems, 1, 50, 12),
+    maxItemsPerSource: clamp(raw.maxItemsPerSource, 1, 50, 4),
+    minAdapterItems: clamp(raw.minAdapterItems, 0, 50, 0),
     lookbackHours: clamp(raw.lookbackHours, 1, 720, 96),
     includeKeywords: Array.isArray(raw.includeKeywords) ? raw.includeKeywords.map(String).map((item) => item.trim().toLowerCase()).filter(Boolean) : [],
     excludeKeywords: Array.isArray(raw.excludeKeywords) ? raw.excludeKeywords.map(String).map((item) => item.trim().toLowerCase()).filter(Boolean) : [],
@@ -205,6 +223,7 @@ export function parseFeed(xml, source) {
       publishedAt: Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : null,
       source: source.name,
       sourceWeight: source.weight,
+      sourceType: 'feed',
     };
   }).filter((item) => {
     if (item.title.length < 4) return false;
@@ -213,14 +232,14 @@ export function parseFeed(xml, source) {
   });
 }
 
-async function fetchText(urlValue) {
+async function fetchText(urlValue, options = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     const response = await fetchPublicResource(urlValue, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'cross-border-e-commerce-daily-report-skill/1.0', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, text/html' },
-    });
+      headers: { 'User-Agent': 'cross-border-e-commerce-daily-report-skill/1.1', Accept: options.accept || 'application/rss+xml, application/atom+xml, application/xml, text/xml, text/html' },
+    }, 0, options.allowedHosts || null);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const reader = response.body?.getReader();
     if (!reader) return '';
@@ -269,9 +288,30 @@ export function filterAndRank(items, config, options = {}) {
     const existing = deduped.get(key);
     if (!existing || scored.score > existing.score) deduped.set(key, scored);
   }
-  return [...deduped.values()]
-    .sort((a, b) => b.score - a.score || String(b.publishedAt || '').localeCompare(String(a.publishedAt || '')))
-    .slice(0, options.maxItems || config.maxItems);
+  const ranked = [...deduped.values()]
+    .sort((a, b) => b.score - a.score || String(b.publishedAt || '').localeCompare(String(a.publishedAt || '')));
+  const selected = [];
+  const sourceCounts = new Map();
+  const limit = options.maxItems || config.maxItems;
+  const selectedHashes = new Set();
+  const addItem = (item) => {
+    if (selected.length >= limit || selectedHashes.has(item.hash)) return false;
+    const count = sourceCounts.get(item.source) || 0;
+    if (count >= config.maxItemsPerSource) return false;
+    sourceCounts.set(item.source, count + 1);
+    selectedHashes.add(item.hash);
+    selected.push(item);
+    return true;
+  };
+  let adapterCount = 0;
+  const adapterMinimum = Math.min(limit, config.minAdapterItems || 0);
+  for (const item of ranked) {
+    if (adapterCount >= adapterMinimum) break;
+    if (item.sourceType === 'adapter' && addItem(item)) adapterCount += 1;
+  }
+  for (const item of ranked) addItem(item);
+  const rank = new Map(ranked.map((item, index) => [item.hash, index]));
+  return selected.sort((a, b) => rank.get(a.hash) - rank.get(b.hash));
 }
 
 async function summarizeWithAi(item) {
@@ -352,7 +392,7 @@ header{margin-bottom:28px}h1{font-size:34px;line-height:1.2;margin:0 0 8px}heade
 .rank{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#eff6ff;color:var(--accent);font-weight:700}
 h2{font-size:19px;line-height:1.4;margin:0 0 8px}a{color:inherit;text-decoration:none}a:hover{color:var(--accent)}p{margin:0 0 9px}
 footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
-</style></head><body><main class="page"><header><h1>${escapeHtml(report.title)}</h1><p>${escapeHtml(report.date)} · ${report.items.length} selected public stories</p></header>${cards}<footer>Generated from public feeds. Verify important facts against the linked original sources before use.</footer></main></body></html>`;
+</style></head><body><main class="page"><header><h1>${escapeHtml(report.title)}</h1><p>${escapeHtml(report.date)} · ${report.items.length} selected public stories</p></header>${cards}<footer>Generated from public sources. Verify important facts against the linked original sources before use.</footer></main></body></html>`;
 }
 
 function webhookText(report) {
@@ -423,8 +463,15 @@ export async function run(options) {
   } else {
     const batches = await Promise.all(config.sources.map(async (source) => {
       try {
-        const xml = await fetchText(source.url);
-        const items = parseFeed(xml, source);
+        let items;
+        if (source.adapter) {
+          const definition = adapterDefinition(source.adapter);
+          const body = await fetchText(definition.url, { allowedHosts: definition.allowedHosts, accept: definition.accept });
+          items = parseAdapter(source.adapter, body, source);
+        } else {
+          const xml = await fetchText(source.url);
+          items = parseFeed(xml, source).slice(0, source.maxItems);
+        }
         console.log(`[source] ${source.name}: ${items.length}`);
         return items;
       } catch (error) {

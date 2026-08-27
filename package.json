@@ -1,11 +1,11 @@
 {
   "name": "cross-border-e-commerce-daily-report-skill",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "Codex Skill for generating cross-border e-commerce news briefs for sellers",
   "scripts": {
-    "check": "node --check cross-border-e-commerce-daily-report/scripts/push_daily_report.mjs",
+    "check": "node --check cross-border-e-commerce-daily-report/scripts/push_daily_report.mjs && node --check cross-border-e-commerce-daily-report/scripts/source_adapters.mjs",
     "test": "node --test tests/*.test.mjs"
   },
   "engines": {

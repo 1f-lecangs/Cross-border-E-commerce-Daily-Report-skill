@@ -1,9 +1,26 @@
 {
-  "title": "Cross-border Commerce Daily Brief",
+  "title": "跨境电商卖家每日资讯",
   "timeZone": "Asia/Shanghai",
   "maxItems": 12,
+  "maxItemsPerSource": 3,
+  "minAdapterItems": 3,
   "lookbackHours": 96,
   "includeKeywords": [
+    "跨境电商",
+    "亚马逊",
+    "temu",
+    "tiktok shop",
+    "海外仓",
+    "物流",
+    "履约",
+    "关税",
+    "清关",
+    "合规",
+    "平台政策",
+    "供应链",
+    "出口",
+    "vat",
+    "eori",
     "ecommerce",
     "cross-border",
     "marketplace",
@@ -18,6 +35,10 @@
     "supply chain"
   ],
   "excludeKeywords": [
+    "体育",
+    "足球",
+    "明星",
+    "游戏",
     "sports",
     "football",
     "celebrity",
@@ -25,29 +46,52 @@
   ],
   "sources": [
     {
+      "name": "CIFNews",
+      "adapter": "cifnews-home",
+      "weight": 3,
+      "maxItems": 12
+    },
+    {
+      "name": "大数跨境",
+      "adapter": "data10100-news",
+      "weight": 3,
+      "maxItems": 12
+    },
+    {
+      "name": "雨果网",
+      "adapter": "ikjzd-news",
+      "weight": 3,
+      "maxItems": 12
+    },
+    {
       "name": "Supply Chain Dive",
       "url": "https://www.supplychaindive.com/feeds/news/",
-      "weight": 3
+      "weight": 3,
+      "maxItems": 12
     },
     {
       "name": "FreightWaves",
       "url": "https://www.freightwaves.com/news/feed",
-      "weight": 3
+      "weight": 3,
+      "maxItems": 12
     },
     {
       "name": "Ecommerce News Europe",
       "url": "https://ecommercenews.eu/feed",
-      "weight": 2
+      "weight": 2,
+      "maxItems": 12
     },
     {
       "name": "Cross-Border Magazine",
       "url": "https://cross-border-magazine.com/feed",
-      "weight": 2
+      "weight": 2,
+      "maxItems": 12
     },
     {
       "name": "Practical Ecommerce",
       "url": "https://www.practicalecommerce.com/feed",
-      "weight": 2
+      "weight": 2,
+      "maxItems": 12
     }
   ],
   "ai": {
