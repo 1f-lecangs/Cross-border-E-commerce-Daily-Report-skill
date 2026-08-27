@@ -1,0 +1,8 @@
+.DS_Store
+.env
+.env.*
+.daily-report-state/
+daily-report-output/
+sources.local.json
+*.tmp
+node_modules/

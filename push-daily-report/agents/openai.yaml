@@ -1,0 +1,4 @@
+interface:
+  display_name: "Daily Report Publisher"
+  short_description: "Collect, review, and optionally publish a safe daily brief"
+  default_prompt: "Use $push-daily-report to collect trusted feeds, generate a reviewed daily HTML brief, and only publish it after approval."

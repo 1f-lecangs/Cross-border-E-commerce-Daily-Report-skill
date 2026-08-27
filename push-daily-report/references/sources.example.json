@@ -1,0 +1,58 @@
+{
+  "title": "Cross-border Commerce Daily Brief",
+  "timeZone": "Asia/Shanghai",
+  "maxItems": 12,
+  "lookbackHours": 96,
+  "includeKeywords": [
+    "ecommerce",
+    "cross-border",
+    "marketplace",
+    "seller",
+    "warehouse",
+    "logistics",
+    "shipping",
+    "freight",
+    "customs",
+    "tariff",
+    "fulfillment",
+    "supply chain"
+  ],
+  "excludeKeywords": [
+    "sports",
+    "football",
+    "celebrity",
+    "gaming"
+  ],
+  "sources": [
+    {
+      "name": "Supply Chain Dive",
+      "url": "https://www.supplychaindive.com/feeds/news/",
+      "weight": 3
+    },
+    {
+      "name": "FreightWaves",
+      "url": "https://www.freightwaves.com/news/feed",
+      "weight": 3
+    },
+    {
+      "name": "Ecommerce News Europe",
+      "url": "https://ecommercenews.eu/feed",
+      "weight": 2
+    },
+    {
+      "name": "Cross-Border Magazine",
+      "url": "https://cross-border-magazine.com/feed",
+      "weight": 2
+    },
+    {
+      "name": "Practical Ecommerce",
+      "url": "https://www.practicalecommerce.com/feed",
+      "weight": 2
+    }
+  ],
+  "ai": {
+    "enabled": false,
+    "maxItems": 8
+  },
+  "webhookType": "generic-json"
+}

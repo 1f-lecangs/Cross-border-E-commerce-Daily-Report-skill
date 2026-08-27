@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Public Test Feed</title>
+    <item>
+      <title>Marketplace sellers adopt regional warehouse fulfillment</title>
+      <link>https://example.com/warehouse-fulfillment</link>
+      <description><![CDATA[Public ecommerce sellers are testing shorter shipping routes and regional inventory.]]></description>
+      <pubDate>Wed, 26 Aug 2026 08:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Customs rule changes affect cross-border shipping</title>
+      <link>https://example.org/customs-shipping</link>
+      <description><![CDATA[A public customs notice changes documentation for selected freight shipments.]]></description>
+      <pubDate>Tue, 25 Aug 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Sports final draws a record audience</title>
+      <link>https://example.net/sports-final</link>
+      <description><![CDATA[This unrelated sports story must be excluded.]]></description>
+      <pubDate>Wed, 26 Aug 2026 09:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Supply chain safety update</title>
+      <link>https://example.edu/supply-chain-safety</link>
+      <description><![CDATA[Warehouse operators publish a safety note.<script>alert('unsafe')</script>]]></description>
+      <pubDate>Wed, 26 Aug 2026 07:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
